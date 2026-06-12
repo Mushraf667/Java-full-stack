@@ -1,0 +1,1 @@
+let value = document.getElementById("wish").innerText="Happy Birthday Mushraf";

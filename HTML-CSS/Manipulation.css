@@ -1,0 +1,14 @@
+img{
+    width: 200px;
+}
+body{
+    background-color: lightblue;
+}
+#content{
+    display: flex;
+    gap: 1cm;
+}
+h1{
+    text-align: center;
+    color: white;
+}
