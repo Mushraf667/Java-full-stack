@@ -1,7 +1,10 @@
+let greetings=["Good Morning","GoodAfternoon","Good night"];
+let num=0;
 function greet_afternoon()
 {
     let text = document.getElementById("greet");
     text.innerText="Good Afternoon";
+    num+=1;
 }
 function turn_on()
 {

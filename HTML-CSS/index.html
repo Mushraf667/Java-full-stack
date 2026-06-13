@@ -3,53 +3,754 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mushraf</title>
+    <title>Mushraf - Retro Terminal Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0a0e27;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .terminal-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #0a0e27;
+            border: 3px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: linear-gradient(90deg, #00ff88, #00ffaa);
+            color: #0a0e27;
+            padding: 0.8rem 1rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00ff88;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        .terminal-title {
+            font-size: 1rem;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid #0a0e27;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-yellow {
+            background-color: #ffeb3b;
+        }
+
+        .btn-red {
+            background-color: #ff5252;
+        }
+
+        .btn-green {
+            background-color: #4caf50;
+        }
+
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background-color: #0a0e27;
+            position: relative;
+            z-index: 1;
+        }
+
+        .terminal-output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal-output::-webkit-scrollbar-track {
+            background: #1a1f3f;
+        }
+
+        .terminal-output::-webkit-scrollbar-thumb {
+            background: #00ff88;
+            border-radius: 4px;
+        }
+
+        .terminal-output::-webkit-scrollbar-thumb:hover {
+            background: #00ffaa;
+        }
+
+        .output-line {
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .command-prompt {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+            align-items: baseline;
+        }
+
+        .prompt {
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .user-input {
+            color: #00ff88;
+            flex: 1;
+        }
+
+        .command-output {
+            color: #00ff88;
+            margin-left: 1rem;
+            margin-bottom: 0.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #51cf66;
+        }
+
+        .info {
+            color: #74c0fc;
+        }
+
+        .warning {
+            color: #ffd43b;
+        }
+
+        .terminal-input-area {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-top: 2px solid #00ff88;
+            background-color: #0a0e27;
+            gap: 0.3rem;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            flex: 1;
+            outline: none;
+            caret-color: #00ff88;
+        }
+
+        .terminal-input::placeholder {
+            color: #00ff88;
+            opacity: 0.5;
+        }
+
+        .cursor {
+            width: 2px;
+            height: 1.2rem;
+            background-color: #00ff88;
+            animation: blink 1s infinite;
+            display: inline-block;
+            margin-left: 0.2rem;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .command-link {
+            color: #00ffff;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: 0.2s;
+        }
+
+        .command-link:hover {
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .ascii-art {
+            color: #00ffaa;
+            font-size: 0.9rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 1rem;
+            background-color: #0f1434;
+            border-top: 1px solid #00ff88;
+            font-size: 0.8rem;
+            color: #00ff88;
+        }
+
+        .typing-animation {
+            display: inline-block;
+            animation: typewriter 0.05s steps(1);
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .glitch {
+            animation: glitch 0.2s;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 #ff6b6b, -2px 0 #00ff88; }
+            50% { text-shadow: -2px 0 #ff6b6b, 2px 0 #00ff88; }
+            100% { text-shadow: 0 0 #ff6b6b, 0 0 #00ff88; }
+        }
+
+        .loading {
+            display: inline-block;
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        @media (max-width: 768px) {
+            .terminal-container {
+                border-width: 2px;
+            }
+
+            .terminal-output {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .terminal-input-area {
+                padding: 0.6rem 0.8rem;
+            }
+
+            .ascii-art {
+                font-size: 0.7rem;
+            }
+        }
+
+        .glow {
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5),
+                         0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .neon-text {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff,
+                         0 0 20px #00ff88,
+                         0 0 30px rgba(0, 255, 136, 0.3);
+            font-weight: bold;
+        }
+    </style>
+
 </head>
 <body>
-    <h1>Self-Intro</h1>
-    <hr>
-    <h2>Mushraf</h2>
-    <p>I am <b> Mushraf </b>,I am doing <u> B.tech </u> 3 <sup> rd </sup>year in the field of <i> CSE </i> in Mother Theresa Engineering College-Melomoi.
-       <br> I have participated in <big> <i> Hackathon </i></big>which is an Intra College <small> Competition. </small> </p>
-    <p>Programming Languages:
-        <br>
-        <ol>
-        <li> C</li><li>Java</li><li>Python</li>
-    </ol></p>
-    <p>
-        <table>
-            <tr>
-                <th>5 <sup>th</sup> Semester </th>
-                <th>Marks</th>
-                <th>Grade</th>
-            </tr>
-            <tr>
-                <td>DBMS</td>
-                <td>89</td>
-                <td><b>A</b></td>
-            </tr>
-            <tr>
-                <td>SE</td>
-                <td>99</td>
-                <td><b>S</b></td>
-            </tr>
-            <tr>
-                <td>OS</td>
-                <td>80</td>
-                <td><b>B</b></td>
-            </tr>
-            <tr>
-                <td>CN</td>
-                <td>76</td>
-                <td><b>B</b></td>
-            </tr>
-            <tr>
-                <td>DS</td>
-                <td>78</td>
-                <td><b>B</b></td>
-            </tr>
-        </table>
-    </p>
-    <a href="/form.html" target="main">Form</a>
+    <div class="terminal-container">
+        <!-- Terminal Header -->
+        <div class="terminal-header">
+            <span class="terminal-title">mushraf@terminal:~$ | Retro Portfolio System v1.0</span>
+            <div class="terminal-buttons">
+                <div class="terminal-btn btn-yellow"></div>
+                <div class="terminal-btn btn-red"></div>
+                <div class="terminal-btn btn-green"></div>
+            </div>
+        </div>
+
+        <!-- Terminal Output Area -->
+        <div class="terminal-output" id="terminal">
+            <div class="ascii-art">
+    __  ___           _               __  
+   /  |/  /_  _______/ /_  _________ _/ _/ 
+  / /  / / / / / ___/ __ \/ ___/ __ `/ /   
+ / /  / / /_/ (__  ) / / / /  / /_/ / /    
+/_/  /_/\__,_/____/_/ /_/_/   \__,_/_/     
+                                           
+   <span class="neon-text">RETRO TERMINAL PORTFOLIO SYSTEM</span>
+   Welcome to the command-line experience
+            </div>
+
+            <div class="output-line">Type <span class="command-link" onclick="executeCommand('help')">help</span> to see available commands</div>
+            <div class="output-line">Or try: <span class="command-link" onclick="executeCommand('about')">about</span> | <span class="command-link" onclick="executeCommand('skills')">skills</span> | <span class="command-link" onclick="executeCommand('contact')">contact</span></div>
+            <div class="output-line"></div>
+        </div>
+
+        <!-- Terminal Status Bar -->
+        <div class="status-bar">
+            <span>Lines: <span id="line-count">1</span></span>
+            <span>Cols: 80 | Rows: 24</span>
+            <span>mushraf@terminal.local | System Ready</span>
+        </div>
+
+        <!-- Terminal Input Area -->
+        <div class="terminal-input-area">
+            <span class="prompt">$</span>
+            <input 
+                type="text" 
+                class="terminal-input" 
+                id="commandInput" 
+                placeholder="Type a command..." 
+                autocomplete="off"
+            >
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const commandInput = document.getElementById('commandInput');
+        const lineCount = document.getElementById('line-count');
+        let commandHistory = [];
+        let historyIndex = -1;
+
+        // Auto-scroll to bottom
+        function scrollToBottom() {
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Execute command
+        function executeCommand(cmd) {
+            commandInput.value = cmd;
+            processCommand(cmd);
+        }
+
+        // Process user input
+        commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = commandInput.value.trim();
+                if (cmd) {
+                    processCommand(cmd);
+                    commandHistory.push(cmd);
+                    historyIndex = -1;
+                }
+                commandInput.value = '';
+            }
+        });
+
+        // Handle command history with arrow keys
+        commandInput.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    commandInput.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    commandInput.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                } else {
+                    historyIndex = -1;
+                    commandInput.value = '';
+                }
+            }
+        });
+
+        function processCommand(cmd) {
+            // Display command
+            const cmdLine = document.createElement('div');
+            cmdLine.className = 'command-prompt';
+            cmdLine.innerHTML = `<span class="prompt">$</span> <span class="user-input">${escapeHtml(cmd)}</span>`;
+            terminal.appendChild(cmdLine);
+
+            // Process command
+            const output = handleCommand(cmd);
+            
+            if (output) {
+                const outputLine = document.createElement('div');
+                outputLine.className = 'command-output';
+                outputLine.innerHTML = output;
+                terminal.appendChild(outputLine);
+            }
+
+            const emptyLine = document.createElement('div');
+            emptyLine.className = 'output-line';
+            terminal.appendChild(emptyLine);
+
+            scrollToBottom();
+            updateLineCount();
+        }
+
+        function handleCommand(cmd) {
+            const command = cmd.toLowerCase().trim();
+            const parts = command.split(' ');
+            const mainCmd = parts[0];
+
+            switch (mainCmd) {
+                case 'help':
+                    return getHelpText();
+                case 'about':
+                case 'whoami':
+                    return getAboutText();
+                case 'degree':
+                case 'education':
+                    return getDegreeText();
+                case 'skills':
+                    return getSkillsText();
+                case 'contact':
+                case 'email':
+                    return getContactText();
+                case 'clear':
+                case 'cls':
+                    terminal.innerHTML = '';
+                    return '';
+                case 'echo':
+                    return escapeHtml(parts.slice(1).join(' '));
+                case 'date':
+                    return new Date().toString();
+                case 'uname':
+                    return 'Retro Terminal Portfolio System v1.0 (Linux-style)';
+                case 'pwd':
+                    return '/home/mushraf/portfolio';
+                case 'ls':
+                    return getDirectoryListing();
+                case 'cat':
+                    if (parts[1] === 'resume.txt') return getResumeText();
+                    return `<span class="error">cat: ${parts[1] || 'file'}: No such file or directory</span>`;
+                case 'info':
+                    return getInfoText();
+                case 'projects':
+                    return getProjectsText();
+                case 'links':
+                    return getLinksText();
+                case '':
+                    return '';
+                default:
+                    return `<span class="error">Command not found: ${mainCmd}</span><br/>Type '<span class="command-link" onclick="executeCommand('help')">help</span>' for available commands`;
+            }
+        }
+
+        function getHelpText() {
+            return `<span class="info">Available Commands:</span>
+
+<span class="success">Navigation:</span>
+  about          - Learn about Mushraf
+  degree         - B.Tech CSE degree information
+  skills         - Technical skills overview
+  contact        - Contact information & email
+  projects       - Featured projects
+  info           - Detailed profile information
+  
+<span class="success">System Commands:</span>
+  help           - Display this help message
+  clear          - Clear terminal
+  ls             - List portfolio files
+  pwd            - Print working directory
+  date           - Show current date/time
+  uname          - System information
+  echo [text]    - Echo text to terminal
+  cat resume.txt - Display resume
+  links          - Social & contact links
+
+<span class="warning">Hint:</span> Click any blue command link or type it directly!`;
+        }
+
+        function getAboutText() {
+            return `<span class="success">$ whoami</span>
+
+<span class="neon-text">Name:</span> Mushraf
+<span class="neon-text">Status:</span> B.Tech CSE Student (3rd Year)
+<span class="neon-text">Institution:</span> Mother Theresa Engineering College, Melomoi
+
+<span class="info">About:</span>
+Passionate software developer and computer science enthusiast with strong 
+interest in web development, algorithms, and system design. Actively involved 
+in hackathons, competitive programming, and continuous learning.
+
+<span class="success">Core Values:</span>
+✓ Clean & efficient code
+✓ Problem-solving mindset
+✓ Team collaboration
+✓ Continuous learning
+✓ Innovation focus`;
+        }
+
+        function getDegreeText() {
+            return `<span class="success">Education Information</span>
+
+<span class="neon-text">Degree:</span> Bachelor of Technology (B.Tech)
+<span class="neon-text">Program:</span> Computer Science & Engineering (CSE)
+<span class="neon-text">Institution:</span> Mother Theresa Engineering College
+<span class="neon-text">Location:</span> Melomoi
+<span class="neon-text">Current Year:</span> 3rd Year
+<span class="neon-text">CGPA:</span> Strong Academic Performance
+
+<span class="info">Core Subjects Covered:</span>
+• Database Management Systems (DBMS)
+• Software Engineering
+• Operating Systems
+• Computer Networks
+• Data Structures & Algorithms
+• Object-Oriented Programming
+• Web Development Technologies`;
+        }
+
+        function getSkillsText() {
+            return `<span class="success">Technical Skills Portfolio</span>
+
+<span class="neon-text">Programming Languages:</span>
+  ▪ C           - Core programming concepts
+  ▪ Java        - OOP, design patterns
+  ▪ Python      - Scripting, data processing
+
+<span class="neon-text">Web Technologies:</span>
+  ▪ HTML5       - Semantic markup
+  ▪ CSS3        - Responsive design, animations
+  ▪ JavaScript  - DOM manipulation, async
+
+<span class="neon-text">Databases:</span>
+  ▪ DBMS        - Normalization, query optimization
+  ▪ SQL         - Complex queries, transactions
+
+<span class="neon-text">Core CS Concepts:</span>
+  ▪ Data Structures    - Arrays, Linked Lists, Trees, Graphs
+  ▪ Algorithms         - Sorting, Searching, Dynamic Programming
+  ▪ Operating Systems  - Process scheduling, Memory management
+  ▪ Networks           - Protocols, TCP/IP, DNS
+
+<span class="neon-text">Soft Skills:</span>
+  ▪ Problem Solving    ★★★★★
+  ▪ Team Collaboration ★★★★★
+  ▪ Communication      ★★★★☆
+  ▪ Leadership         ★★★★☆`;
+        }
+
+        function getContactText() {
+            return `<span class="success">Contact Information</span>
+
+<span class="neon-text">Email Address:</span>
+  📧 <a href="mailto:mushrafmushu855@gmail.com" style="color: #00ffff; text-decoration: none;">mushrafmushu855@gmail.com</a>
+     (Click to send email or copy address above)
+
+<span class="neon-text">Institution:</span>
+  🏫 Mother Theresa Engineering College
+     Melomoi, India
+
+<span class="neon-text">Get in Touch For:</span>
+  ✓ Collaboration opportunities
+  ✓ Project partnerships
+  ✓ Freelance work
+  ✓ Internship discussions
+  ✓ General inquiries
+
+<span class="info">Available Links:</span>
+  Type '<span class="command-link" onclick="executeCommand('links')">links</span>' to see social profiles
+  
+<span class="warning">Quick Tip:</span> Connect via email for fastest response!`;
+        }
+
+        function getProjectsText() {
+            return `<span class="success">Featured Projects</span>
+
+<span class="neon-text">1. Intra-College Hackathon</span>
+   Status: Completed ✓
+   Description: Innovative solutions to real-world problems
+   Technologies: Multi-tech stack, team collaboration
+   Impact: Positive reception, awards consideration
+
+<span class="neon-text">2. Database Management System</span>
+   Status: Completed ✓
+   Description: Comprehensive DBMS with SQL optimization
+   Technologies: SQL, Database Design, Normalization
+   Features: Complex queries, transaction handling
+
+<span class="neon-text">3. Operating System Concepts</span>
+   Status: Completed ✓
+   Description: Implementation of core OS algorithms
+   Technologies: C, Process scheduling, Memory management
+   Topics: CPU scheduling, Synchronization
+
+<span class="neon-text">4. Web Development Projects</span>
+   Status: In Progress
+   Description: Modern responsive web applications
+   Technologies: HTML5, CSS3, JavaScript
+   Focus: UX/UI, Performance optimization`;
+        }
+
+        function getInfoText() {
+            return `<span class="success">Detailed Portfolio Information</span>
+
+<span class="neon-text">System Status:</span>
+  System Uptime: 1000+ hours of coding
+  Last Updated: 2024
+  Status: [ACTIVE]
+
+<span class="neon-text">Career Goals:</span>
+  ▪ Become a skilled full-stack developer
+  ▪ Contribute to open-source projects
+  ▪ Build impactful software solutions
+  ▪ Stay updated with latest technologies
+
+<span class="neon-text">Quick Stats:</span>
+  Projects Completed: 3+
+  Languages Known: 5+
+  Hackathons Participated: Multiple
+  GitHub Activity: Regular
+  Learning Status: Continuous
+
+<span class="neon-text">Interests:</span>
+  ▪ Web Development
+  ▪ System Design
+  ▪ Artificial Intelligence basics
+  ▪ Cloud Technologies
+  ▪ DevOps practices
+  ▪ Mobile Development
+
+Type '<span class="command-link" onclick="executeCommand('help')">help</span>' for more commands!`;
+        }
+
+        function getDirectoryListing() {
+            return `Total files: 8
+
+<span class="success">drwx------ . portfolio-index</span>
+-rw-r--r-- . resume.txt (2.3K)
+-rw-r--r-- . about.txt (1.8K)
+-rw-r--r-- . skills.txt (2.1K)
+-rw-r--r-- . projects.txt (3.2K)
+-rw-r--r-- . contact.txt (1.5K)
+-rw-r--r-- . education.txt (2.0K)
+drwx------ . social-links
+drwx------ . archives
+
+Use '<span class="command-link" onclick="executeCommand('cat resume.txt')">cat resume.txt</span>' to view resume`;
+        }
+
+        function getResumeText() {
+            return `<span class="neon-text">═══════════════════════════════════════════════</span>
+<span class="neon-text">                    RESUME</span>
+<span class="neon-text">═══════════════════════════════════════════════</span>
+
+<span class="success">MUSHRAF</span>
+Email: mushrafmushu855@gmail.com
+Education: B.Tech CSE, Mother Theresa Engineering College
+
+<span class="info">EDUCATION:</span>
+Bachelor of Technology in Computer Science & Engineering
+Mother Theresa Engineering College, Melomoi
+Current Year: 3rd Year | CGPA: Strong Performance
+
+<span class="info">TECHNICAL SKILLS:</span>
+Languages: C, Java, Python
+Web: HTML5, CSS3, JavaScript
+Databases: DBMS, SQL
+Core CS: Data Structures, Algorithms, OS, Networks
+
+<span class="info">EXPERIENCE:</span>
+• Intra-college Hackathon Participant
+• Database Management System Developer
+• OS Concepts Implementation
+• Web Development Projects
+
+<span class="info">ACHIEVEMENTS:</span>
+✓ Active in hackathons
+✓ Strong academic record
+✓ Problem-solving skills
+✓ Team player
+
+<span class="info">CONTACT:</span>
+Email: mushrafmushu855@gmail.com
+College: Mother Theresa Engineering College
+
+<span class="neon-text">═══════════════════════════════════════════════</span>`;
+        }
+
+        function getLinksText() {
+            return `<span class="success">Social Links & Resources</span>
+
+<span class="neon-text">Contact Methods:</span>
+  📧 Email: <a href="mailto:mushrafmushu855@gmail.com" style="color: #00ffff; text-decoration: none;">mushrafmushu855@gmail.com</a>
+  
+<span class="neon-text">Quick Commands to Explore:</span>
+  <span class="command-link" onclick="executeCommand('about')">about</span>      - Personal information
+  <span class="command-link" onclick="executeCommand('degree')">degree</span>     - Education details
+  <span class="command-link" onclick="executeCommand('skills')">skills</span>     - Technical expertise
+  <span class="command-link" onclick="executeCommand('contact')">contact</span>    - Contact information
+  <span class="command-link" onclick="executeCommand('projects')">projects</span>   - Portfolio projects
+  <span class="command-link" onclick="executeCommand('info')">info</span>       - Full profile info
+
+<span class="warning">Pro Tip:</span> Commands are case-insensitive. Try 'whoami' or 'education' too!`;
+        }
+
+        function updateLineCount() {
+            lineCount.textContent = terminal.children.length;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Focus on input when page loads
+        window.addEventListener('load', () => {
+            commandInput.focus();
+            scrollToBottom();
+            updateLineCount();
+        });
+
+        // Focus on input when clicking terminal
+        terminal.addEventListener('click', () => {
+            commandInput.focus();
+        });
+
+        // Prevent scrolling with arrow keys while in input
+        commandInput.addEventListener('keydown', (e) => {
+            if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
