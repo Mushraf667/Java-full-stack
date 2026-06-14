@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Move Box</title>
+    <style>
+        #chocolate {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            background-color: lavender;
+            border: 3px double black;
+        }
+    </style>
+</head>
+<body>
+<div id="chocolate"></div>
+<script>
+    const box = document.getElementById("chocolate");
+    let x = 100;
+    let y = 100;
+    const step = 10;
+    document.addEventListener("keydown", function (keys) {
+        if (keys.code === "ArrowDown") {
+            y += step;
+        }
+        if (keys.code === "ArrowUp") {
+            y -= step;
+        }
+        if (keys.code === "ArrowRight") {
+            x += step;
+        }
+        if (keys.code === "ArrowLeft") {
+            x -= step;
+        }
+        box.style.left = x + "px";
+        box.style.top = y + "px";
+    });
+    box.addEventListener("mouseover", function () {
+        box.style.backgroundColor = "brown";
+        box.innerText = "Dark";
+    });
+    box.addEventListener("mouseout", function () {
+        box.style.backgroundColor = "lavender";
+        box.innerText = "";
+    });
+</script>
+</body>
+</html>
